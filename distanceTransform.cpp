@@ -60,20 +60,24 @@ std::vector<float> distanceTransform1D(std::vector<int>& map)
     int N = map.size();
     std::vector<float> dt(N, 0);
     std::vector<float> dcompare(N, 0);
-
+ 
     for (int i=0;i<N;i++){ // populates dt that traverses forward
         if (map[i]==1){
             dt[i]=0;
         }
         else dt[i]=dt[i-1]+1;
     }
+    if (map[0]==0){ // values are wrong if 1st idx is 0
+        dt[0] = 1000;
+    }
     for (int i=N-1;i>=0;i--){ // populates dcompare, a vector that traverses backward
         if (map[i]==1){
             dcompare[i]=0;
         }
-        else {
-            dcompare[i]=dcompare[i+1]+1;
-        }
+        else dcompare[i]=dcompare[i+1]+1;
+    }
+    if (map[N]==0){ // values are wrong if Nth idx is 0
+        dcompare[N] = 1000;
     }
     for (int i=0;i<N;i++){ // takes the lowest value of each of the two indices
         if (dcompare[i]<dt[i]){
@@ -89,6 +93,10 @@ std::vector<float> distanceTransform2D(std::vector<int>& map,
     int N = width * height;
     std::vector<float> dt(N, 0);
     
+    // for (int i; i<N; N++) {
+    //     dt[i] = abs() + abs();
+    // }
+
     // TODO: Implement the 2D Manhattan distance transform of a binary map.
 
     return dt;
@@ -97,7 +105,7 @@ std::vector<float> distanceTransform2D(std::vector<int>& map,
 int main() {
     // 1D distance transform.
     // TODO: Try different maps!
-    std::vector<int> map1D = {0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1};
+    std::vector<int> map1D = {0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1};
     std::vector<float> dt1D = distanceTransform1D(map1D);
 
     std::cout << "Map:\n";
