@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 
 #define HIGH 1e6;
 
@@ -95,13 +96,22 @@ std::vector<float> distanceTransform2D(std::vector<int>& map,
 {
     int N = width * height;
     std::vector<float> dt(N, 0);
-    
-    // for (int i; i<N; N++) {
-    //     dt[i] = abs() + abs();
-    // }
-
-    // TODO: Implement the 2D Manhattan distance transform of a binary map.
-
+    for (int i = 0; i < height; i++){
+        for (int j = 0; j < width; j++){
+            // Traversing the whole matrix
+            // to find the minimum distance.
+            for (int k = 0; k < height; k++){
+                for (int l = 0; l < width; l++){
+                    // If cell contain 1, check
+                    // for minimum distance.
+                    if (map[k][l] == 1){
+                        ans[i][j] = std::min(ans[i][j],
+                                abs(i-k) + abs(j-l));
+                    }
+                }
+            }
+        }
+    }
     return dt;
 }
 
