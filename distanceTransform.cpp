@@ -94,15 +94,52 @@ std::vector<float> distanceTransform1D(std::vector<int>& map)
 std::vector<float> distanceTransform2D(std::vector<int>& map,
                                        int height, int width)
 {
-    std::vector<std::vector<float>> dtM;
+    std::vector<std::vector<float>> goalsMatrix;
+    std::vector<std::vector<float>> dtMatrix;
     std::vector<float> dtIdx;
-    // std::vector<float> dt(N, 0);
+    std::vector<std::vector<int>> goals;
+    float minDist = 1000;
+    float newDist;
     int N = width * height;
-    std::vector<float> dt(N, 0);
-    for (int i = 0; i<N; ++i){
+
+    for (int i = 0; i<N; ++i){  // turns map vector into vec of vecs
         dtIdx.push_back(map[i]);
         if (N%(i+1) == 0){
-            dtM.push_back(dtIdx);
+            goalsMatrix.push_back(dtIdx);
+        }
+    }
+
+    for (int i = 0; i<height; ++i){  // creates vec of vecs as answer instead of dt
+        for (int j; j <width; ++j){
+            dtMatrix[i].push_back(0);
+        }
+    }
+
+    for (int i = 0; i<height; ++i){  // finds the coordinates of the goals
+        for (int j = 0; j<width; ++j){
+            if (goalsMatrix[i][j]==1){
+                goals.push_back({i, j});  // e.g. {(1, 4), (2, 0), etc.}
+            }
+        }
+    }
+
+    for (int i = 0; i<height; ++i){
+        for (int j = 0; j<width; ++j){  // populates dtMatrix with lowest dists 
+            for (int k = 0; k < goals.size(); ++k){
+                newDist = abs(goals[k][0] - i) + abs(goals[k][1] - j);
+                if (newDist < minDist){
+                    newDist = minDist;
+                }
+            }
+            dtMatrix[i][j] = minDist;
+        }
+    }
+
+    std::vector<float> dt(N, 0);  
+
+    for (int i = 0; i < height; ++i){
+        for (int j = 0; j < width; ++j){
+            dt.push_back(dtMatrix[i][j]);
         }
     }
 
