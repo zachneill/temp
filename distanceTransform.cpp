@@ -94,24 +94,18 @@ std::vector<float> distanceTransform1D(std::vector<int>& map)
 std::vector<float> distanceTransform2D(std::vector<int>& map,
                                        int height, int width)
 {
+    std::vector<std::vector<float>> dtM;
+    std::vector<float> dtIdx;
+    // std::vector<float> dt(N, 0);
     int N = width * height;
     std::vector<float> dt(N, 0);
-    for (int i = 0; i < height; i++){
-        for (int j = 0; j < width; j++){
-            // Traversing the whole matrix
-            // to find the minimum distance.
-            for (int k = 0; k < height; k++){
-                for (int l = 0; l < width; l++){
-                    // If cell contain 1, check
-                    // for minimum distance.
-                    if (map[k][l] == 1){
-                        ans[i][j] = std::min(ans[i][j],
-                                abs(i-k) + abs(j-l));
-                    }
-                }
-            }
+    for (int i = 0; i<N; ++i){
+        dtIdx.push_back(map[i]);
+        if (N%(i+1) == 0){
+            dtM.push_back(dtIdx);
         }
     }
+
     return dt;
 }
 
