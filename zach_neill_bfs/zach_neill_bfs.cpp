@@ -17,8 +17,8 @@ struct Graph
     std::vector<std::string> data;
     std::vector<std::vector<int> > edges;
     std::vector<std::vector<float> > edge_costs;
-
     // TODO: Add any members you need to the graph.
+    std::vector<float> dists;
 };
 
 /**
@@ -69,7 +69,7 @@ Graph createGraph(std::string file_path)
 
     g.edges = std::vector<std::vector<int> >(N, std::vector<int>());
     g.edge_costs = std::vector<std::vector<float> >(N, std::vector<float>());
-
+    g.dists = std::vector<float>(N, 10000);
     while (s != "EDGES") in >> s >> N;
 
     std::string city1, city2;
@@ -130,6 +130,7 @@ std::vector<float> getEdgeCosts(int n, Graph& g)
 
 int getParent(int idx, Graph& g)
 {
+    int parent = -1;
     std::vector<int> neighbors = getNeighbors(idx, g);
     // std::cout << neighbors[0] << "\n";
     for (int i=0; i < neighbors.size(); i++){
@@ -137,7 +138,8 @@ int getParent(int idx, Graph& g)
     }
     // TODO: This function should return the index of the parent of the node at idx. 
     // If the node has no parent, return -1. 
-    return -1;
+    // float target_dist = dist[idx] - 
+    return parent;
 }
 
 void initGraph(Graph& g)
