@@ -133,7 +133,7 @@ int getParent(int idx, Graph& g)
     std::vector<int> neighbors = getNeighbors(idx, g);
     // std::cout << neighbors[0] << "\n";
     for (int i=0; i < neighbors.size(); i++){
-        std::cout << neighbors[i]<<"\n";
+        // std::cout << neighbors[i]<<"\n";
     }
     // TODO: This function should return the index of the parent of the node at idx. 
     // If the node has no parent, return -1. 
@@ -147,13 +147,27 @@ void initGraph(Graph& g)
 
 std::vector<int> bfs(int start, int goal, Graph& g)
 {
-    initGraph(g);
+    initGraph(g); 
+    std::vector<int> neighbors;
+    std::vector<float> costs;
     std::vector<int> path;  // Put your final path here.
-
+    int current;
     std::queue<int> visit_list;
-    visit_list.push(start);
+    current = start; // start is its own case for now 
+    neighbors = getNeighbors(current, g);
+    for (int i = 0; i < neighbors.size(); i++){
+        visit_list.push(neighbors[i]);  // add neighbors to visit list
+        int parent = getParent(neighbors[i], g); 
+        
+        costs = getEdgeCosts(neighbors[i], g);
+        for (int j = 0; j < costs.size(); j++) std::cout << "\n"<<costs[j];
+        int current_neighbor = neighbors[i];
+    } 
+    
     for (int i = 0; i < g.data.size(); i++){  // traverses all 15 nodes 
-        std::cout << i;
+        current = visit_list.front();
+        if (current == goal) break;
+        visit_list.pop();
     }
     // TODO: Perform Breadth First Search over the graph g.
 
