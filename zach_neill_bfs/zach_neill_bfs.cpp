@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
+#include <map>
 
 #define HIGH 1e6
 
@@ -16,6 +17,7 @@ struct Node {
     int parentIdx; 
     float currentDist;
     float parentDist;
+    std::map<int, int> parentMap;
 };
 struct Graph
 {
@@ -37,9 +39,9 @@ std::vector<int> tracePath(int n, Graph& g);
 void printPath(std::vector<int>& path, Graph& g);
 std::vector<int> getNeighbors(int n, Graph& g);
 std::vector<float> getEdgeCosts(int n, Graph& g);
-int getParent(int n, Graph& g);
+int getParent(int n, Graph& g, Node& node);
 void initGraph(Graph& g);
-std::vector<int> bfs(int start, int goal, Graph& g);
+std::vector<int> bfs(int start, int goal, Graph& g, Node& n);
 
 /**
  * Function implementations.
@@ -98,13 +100,13 @@ Graph createGraph(std::string file_path)
     return g;
 }
 
-std::vector<int> tracePath(int n, Graph& g)
+std::vector<int> tracePath(int n, Graph& g, Node& node)
 {
     std::vector<int> path;
     int curr = n;
     do {
         path.push_back(curr);
-        curr = getParent(curr, g);
+        curr = getParent(curr, g, node);
     } while (curr != -1);
 
     // Since we built the path backwards, we need to reverse it.
@@ -138,9 +140,9 @@ std::vector<float> getEdgeCosts(int n, Graph& g)
     return g.edge_costs[n];
 }
 
-int getParent(int idx, Graph& g, Node& n)
+int getParent(int idx, Graph& g, Node& node)
 {
-    return n.parentIdx;
+    return node.parentMap[idx];
 }
 
 void initGraph(Graph& g)
@@ -156,22 +158,30 @@ std::vector<int> bfs(int start, int goal, Graph& g, Node& n)
     std::queue<int> visit_list;
 
     n.currentIdx = start;  // setup for root node
+    n.parentMap.insert({n.currentIdx, -1});
     n.currentDist = 0;
     visit_list.push(n.currentIdx);
 
     for (int i = 0; i < g.data.size(); i++){  // traverses all 15 nodes 
+        n.parentIdx = n.currentIdx;
         n.currentIdx = visit_list.front();
-        if (n.currentIdx == goal) break;
-        visit_list.pop();
+        if (n.currentIdx == goal){
+            goal = n.currentIdx;
+            path = tracePath(goal, g, n);
+            break;
+        }
+        visit_list.pop(); // moves current index from visit list to current node
+
         g.neighbors = getNeighbors(n.currentIdx, g);
         for (int i = 0; i < g.neighbors.size(); i++){
-            visit_list.push(g.neighbors[i]);  // add neighbors to visit list
+            n.parentMap.insert({g.neighbors[i], n.parentIdx});
+            visit_list.push(g.neighbors[i]); // Add each unvisited neighbor of current to back of visit list.
         }
-        n.parentIdx = getParent(n.currentIdx, g); 
-        g.dists[n.currentIdx] += g.dists[n.parentIdx];
+        // Set parent of each neighbor to current, set distance to current distance + 1. Go to 2.
+        n.parentIdx = getParent(n.currentIdx, g, n); 
+        g.dists[n.currentIdx] = g.dists[n.parentIdx];
     }
     // TODO: Perform Breadth First Search over the graph g.
-
     return path;
 }
 
@@ -185,7 +195,7 @@ int main() {
     std::cout << " (index: " << start << ") to " << g.data[goal];
     std::cout << " (index: " << goal << ")...\n";
 
-    std::vector<int> path = bfs(start, goal, g);
+    std::vector<int> path = bfs(start, goal, g, n);
     printPath(path, g);
 
     return 0;
