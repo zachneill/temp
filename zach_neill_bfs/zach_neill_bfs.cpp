@@ -169,9 +169,7 @@ int main() {
     std::cout << "Searching for a path from " << g.data[start];
     std::cout << " (index: " << start << ") to " << g.data[goal];
     std::cout << " (index: " << goal << ")...\n";
-
     std::vector<int> path = bfs(start, goal, g);
     printPath(path, g);
-
     return 0;
 } 
