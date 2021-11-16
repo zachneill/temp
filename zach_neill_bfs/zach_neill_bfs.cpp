@@ -141,7 +141,6 @@ int getParent(int idx, Graph& g)
 
 void initGraph(Graph& g)
 {
-    // TODO: Initialize any data you need for graph search.
     for (int i = 0; i< g.data.size(); i++){
         Node n;
         g.node_vec.push_back(n);
@@ -169,12 +168,12 @@ std::vector<int> bfs(int start, int goal, Graph& g)
             path = tracePath(g.currentIdx, g);
             break;
         }
-        visit_list.pop(); // moves current index from visit list to current node
+        visit_list.pop();  // moves current index from visit list to current node
 
         for (int i = 0; i < neighbors.size(); i++){
             if (! g.node_vec[neighbors[i]].visited){
                 if (! g.node_vec[neighbors[i]].queued){
-                    visit_list.push(neighbors[i]); // Add unvisited neighbor of current to back of visit.
+                    visit_list.push(neighbors[i]);  // Add unvisited neighbor of current to back of visit.
                 }
                 if (g.node_vec[neighbors[i]].dist > g.node_vec[g.currentIdx].dist + costs[i]){
                     g.node_vec[neighbors[i]].dist = g.node_vec[g.currentIdx].dist + costs[i];
@@ -183,7 +182,6 @@ std::vector<int> bfs(int start, int goal, Graph& g)
             }
         }
     }
-    // TODO: Perform Breadth First Search over the graph g.
     return path;
 }
 
