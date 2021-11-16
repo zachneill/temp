@@ -13,11 +13,12 @@
  * TODO: Define any structs you might need here.
  */
 struct Node {
-    int currentIdx;
     int parentIdx; 
-    float currentDist;
-    float parentDist;
-    std::map<int, int> parentMap;
+    float dist;
+    float dist; 
+    bool visited;
+    bool queued;
+    int parent;
 };
 struct Graph
 {
@@ -27,7 +28,8 @@ struct Graph
     // TODO: Add any members you need to the graph.
     std::vector<float> dists; 
     std::vector<int> neighbors;
-    std::vector<float> costs;
+    std::vector<Node> node_vec;
+    int currentIdx;
 };
 
 /**
@@ -142,44 +144,46 @@ std::vector<float> getEdgeCosts(int n, Graph& g)
 
 int getParent(int idx, Graph& g, Node& node)
 {
-    return node.parentMap[idx];
+    return node.parent;
 }
 
 void initGraph(Graph& g)
 {
     // TODO: Initialize any data you need for graph search.
+    for (int i = 0; i< g.data.size(); i++){
+        Node n;
+        g.node_vec.push_back(n);
+    }
 }
 
 std::vector<int> bfs(int start, int goal, Graph& g, Node& n)
 {
-    
     initGraph(g); 
     std::vector<int> path;  // Put your final path here.
     std::queue<int> visit_list;
+    g.currentIdx = start;  // setup for root node
+    n.dist = 0;
+    visit_list.push(g.currentIdx);
 
-    n.currentIdx = start;  // setup for root node
-    n.parentMap.insert({n.currentIdx, -1});
-    n.currentDist = 0;
-    visit_list.push(n.currentIdx);
-
-    for (int i = 0; i < g.data.size(); i++){  // traverses all 15 nodes 
-        n.parentIdx = n.currentIdx;
-        n.currentIdx = visit_list.front();
-        if (n.currentIdx == goal){
-            goal = n.currentIdx;
+    while (! visit_list.empty()){  // traverses nodes until we hit jackpot 
+        n.parentIdx = g.currentIdx;
+        g.currentIdx = visit_list.front();
+        if (g.currentIdx == goal){
+            goal = g.currentIdx;
             path = tracePath(goal, g, n);
             break;
         }
         visit_list.pop(); // moves current index from visit list to current node
 
-        g.neighbors = getNeighbors(n.currentIdx, g);
+        g.neighbors = getNeighbors(g.currentIdx, g);
         for (int i = 0; i < g.neighbors.size(); i++){
-            n.parentMap.insert({g.neighbors[i], n.parentIdx});
             visit_list.push(g.neighbors[i]); // Add each unvisited neighbor of current to back of visit list.
         }
         // Set parent of each neighbor to current, set distance to current distance + 1. Go to 2.
-        n.parentIdx = getParent(n.currentIdx, g, n); 
-        g.dists[n.currentIdx] = g.dists[n.parentIdx];
+        n.parentIdx = getParent(g.currentIdx, g, n); 
+        for (int i = 0; i < g.neighbors.size(); i++){
+            g.node_vec[g.currentIdx] = g.node_vec[n.parentIdx];
+        }
     }
     // TODO: Perform Breadth First Search over the graph g.
     return path;
