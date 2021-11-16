@@ -11,14 +11,21 @@
 /**
  * TODO: Define any structs you might need here.
  */
-
+struct Node {
+    int currentIdx;
+    int parentIdx; 
+    float currentDist;
+    float parentDist;
+};
 struct Graph
 {
     std::vector<std::string> data;
     std::vector<std::vector<int> > edges;
     std::vector<std::vector<float> > edge_costs;
     // TODO: Add any members you need to the graph.
-    std::vector<float> dists;
+    std::vector<float> dists; 
+    std::vector<int> neighbors;
+    std::vector<float> costs;
 };
 
 /**
@@ -46,7 +53,10 @@ int nameToIdx(std::string name, std::vector<std::string>& v)
     }
     return -1;
 }
-
+Node createNode(){
+    Node n;
+    return n;
+}
 Graph createGraph(std::string file_path)
 {
     Graph g;
@@ -128,18 +138,9 @@ std::vector<float> getEdgeCosts(int n, Graph& g)
     return g.edge_costs[n];
 }
 
-int getParent(int idx, Graph& g)
+int getParent(int idx, Graph& g, Node& n)
 {
-    int parent = -1;
-    std::vector<int> neighbors = getNeighbors(idx, g);
-    // std::cout << neighbors[0] << "\n";
-    for (int i=0; i < neighbors.size(); i++){
-        // std::cout << neighbors[i]<<"\n";
-    }
-    // TODO: This function should return the index of the parent of the node at idx. 
-    // If the node has no parent, return -1. 
-    // float target_dist = dist[idx] - 
-    return parent;
+    return n.parentIdx;
 }
 
 void initGraph(Graph& g)
@@ -147,29 +148,27 @@ void initGraph(Graph& g)
     // TODO: Initialize any data you need for graph search.
 }
 
-std::vector<int> bfs(int start, int goal, Graph& g)
+std::vector<int> bfs(int start, int goal, Graph& g, Node& n)
 {
-    initGraph(g); 
-    std::vector<int> neighbors;
-    std::vector<float> costs;
-    std::vector<int> path;  // Put your final path here.
-    int current;
-    std::queue<int> visit_list;
-    current = start; // start is its own case for now 
-    neighbors = getNeighbors(current, g);
-    for (int i = 0; i < neighbors.size(); i++){
-        visit_list.push(neighbors[i]);  // add neighbors to visit list
-        int parent = getParent(neighbors[i], g); 
-        
-        costs = getEdgeCosts(neighbors[i], g);
-        for (int j = 0; j < costs.size(); j++) std::cout << "\n"<<costs[j];
-        int current_neighbor = neighbors[i];
-    } 
     
+    initGraph(g); 
+    std::vector<int> path;  // Put your final path here.
+    std::queue<int> visit_list;
+
+    n.currentIdx = start;  // setup for root node
+    n.currentDist = 0;
+    visit_list.push(n.currentIdx);
+
     for (int i = 0; i < g.data.size(); i++){  // traverses all 15 nodes 
-        current = visit_list.front();
-        if (current == goal) break;
+        n.currentIdx = visit_list.front();
+        if (n.currentIdx == goal) break;
         visit_list.pop();
+        g.neighbors = getNeighbors(n.currentIdx, g);
+        for (int i = 0; i < g.neighbors.size(); i++){
+            visit_list.push(g.neighbors[i]);  // add neighbors to visit list
+        }
+        n.parentIdx = getParent(n.currentIdx, g); 
+        g.dists[n.currentIdx] += g.dists[n.parentIdx];
     }
     // TODO: Perform Breadth First Search over the graph g.
 
@@ -177,8 +176,8 @@ std::vector<int> bfs(int start, int goal, Graph& g)
 }
 
 int main() {
+    Node n = createNode();
     Graph g = createGraph("mi_graph.txt");
-
     int start = nameToIdx("ann_arbor", g.data);
     int goal = nameToIdx("marquette", g.data);
 
