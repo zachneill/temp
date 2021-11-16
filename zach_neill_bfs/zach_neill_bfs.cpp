@@ -8,9 +8,6 @@
 
 #define HIGH 1e6
 
-/**
- * TODO: Define any structs you might need here.
- */
 struct Node {
     float dist = 1000000;
     int parentIdx = -1; 
@@ -22,16 +19,11 @@ struct Graph
     std::vector<std::string> data;
     std::vector<std::vector<int> > edges;
     std::vector<std::vector<float> > edge_costs;
-    // TODO: Add any members you need to the graph.
     std::vector<float> costs;
     std::vector<Node> node_vec;
-
     int currentIdx;
 };
 
-/**
- * Function definitions.
- */
 int nameToIdx(std::string name, std::vector<std::string>& v);
 Graph createGraph(std::string file_path);
 std::vector<int> tracePath(int n, Graph& g);
@@ -42,16 +34,9 @@ void initGraph(Graph& g);
 int getParent(int n, Graph& g);
 std::vector<int> bfs(int start, int goal, Graph& g);
 
-/**
- * Function implementations.
- */
-
 int nameToIdx(std::string name, std::vector<std::string>& v)
 {
-    for (int i = 0; i < v.size(); i++)
-    {
-        if (v[i] == name) return i;
-    }
+    for (int i = 0; i < v.size(); i++) if (v[i] == name) return i;
     return -1;
 }
 Graph createGraph(std::string file_path)
@@ -90,7 +75,6 @@ Graph createGraph(std::string file_path)
         g.edge_costs[c1].push_back(dist);
         g.edge_costs[c2].push_back(dist);
     }
-
     return g;
 }
 
@@ -103,8 +87,7 @@ std::vector<int> tracePath(int n, Graph& g)
         curr = getParent(curr, g);
     } while (curr != -1);
 
-    // Since we built the path backwards, we need to reverse it.
-    std::reverse(path.begin(), path.end());
+    std::reverse(path.begin(), path.end());  // Since we built the path backwards, we need to reverse it.
     return path;
 }
 
@@ -117,10 +100,7 @@ void printPath(std::vector<int>& path, Graph& g)
     }
 
     std::cout << "Path: ";
-    for (int i = 0; i < path.size() - 1; i++)
-    {
-        std::cout << g.data[path[i]] << " -> ";
-    }
+    for (int i = 0; i < path.size() - 1; i++) std::cout << g.data[path[i]] << " -> ";
     std::cout <<  g.data[path.back()] << "\n";
 }
 
@@ -149,11 +129,11 @@ void initGraph(Graph& g)
 
 std::vector<int> bfs(int start, int goal, Graph& g)
 {
-    initGraph(g); 
+    initGraph(g);  // basic inits
     std::vector<int> path; 
     std::queue<int> visit_list;
 
-    g.node_vec[start].dist = 0;  // setup for root node
+    g.node_vec[start].dist = 0;  // setup for initial node
     g.node_vec[start].queued = true;
     visit_list.push(start);
 
@@ -161,24 +141,20 @@ std::vector<int> bfs(int start, int goal, Graph& g)
         g.currentIdx = visit_list.front();
         g.node_vec[g.currentIdx].visited = true;
         std::vector<int> neighbors = getNeighbors(g.currentIdx, g);
-
         std::vector<float> costs = getEdgeCosts(g.currentIdx, g);
 
-        if (g.currentIdx == goal){
+        if (g.currentIdx == goal){  // ends if we reached our destination
             path = tracePath(g.currentIdx, g);
             break;
         }
         visit_list.pop();  // moves current index from visit list to current node
-
         for (int i = 0; i < neighbors.size(); i++){
-            if (! g.node_vec[neighbors[i]].visited){
-                if (! g.node_vec[neighbors[i]].queued){
-                    visit_list.push(neighbors[i]);  // Add unvisited neighbor of current to back of visit.
-                }
+            if (! g.node_vec[neighbors[i]].visited){  // Add unvisited neighbor of current to back of visit.
+                if (! g.node_vec[neighbors[i]].queued) visit_list.push(neighbors[i]);
                 if (g.node_vec[neighbors[i]].dist > g.node_vec[g.currentIdx].dist + costs[i]){
                     g.node_vec[neighbors[i]].dist = g.node_vec[g.currentIdx].dist + costs[i];
                     g.node_vec[neighbors[i]].parentIdx = g.currentIdx;
-                }
+                }  // compares distances to avoid the connection loop
             }
         }
     }
